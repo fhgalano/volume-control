@@ -52,7 +52,7 @@ void down() {
 
   // This if loop creates a debounce for 200ms
   if ( (interrupt_time - last_interrupt_time) > 50 ) {
-    val = last_val;
+    last_val = val;
     if ( temp ) {
       val++;
       }
@@ -64,6 +64,7 @@ void down() {
   }
 
   //last_interrupt_time = interrupt_time;
+  
   
 }
 
