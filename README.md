@@ -33,3 +33,10 @@ Not Implemented
 ----------CAD----------
 Not Implemented
 
+
+UPDATE:
+For anyone looking at the network history and thinking 'what the heck happened here?': I
+did not originally update my global usernames to match my github account, so the commits
+were posting from my linux username. I went back with rebase to fix those previous commits.
+
+
