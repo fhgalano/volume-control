@@ -13,7 +13,7 @@ const int pin_pb = 13;
 const int pin_encA = 3;
 const int pin_encB = 2;
 
-int encA, encB, ccwise, cwise, val, last_val = 0;
+int encA, encB, ccwise, cwise, val, last_val, delta = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -45,18 +45,26 @@ void loop() {
 }
 
 void down() {
-  static unsigned long last_interrupt_time = 0;
+  // declare locals
+  static unsigned long last_interrupt_time = 0; // statics persist throughout function calls
   unsigned long interrupt_time = millis();
-  int temp = digitalRead( pin_encB );
-  if ( interrupt_time - last_interrupt_time < 200 ) {
+  int temp = digitalRead( pin_encB ); // I want the second encoder pin to be read as fast as possible from the interrupt
+
+  // This if loop creates a debounce for 200ms
+  if ( (interrupt_time - last_interrupt_time) > 50 ) {
+    val = last_val;
     if ( temp ) {
       val++;
       }
     else {
       val--;
     }
+
+    last_interrupt_time = interrupt_time; // last interrupt is more like last successful interrupt. Where a success is going into the if statement. 
   }
-  last_interrupt_time = interrupt_time;
+
+  //last_interrupt_time = interrupt_time;
+  
 }
 
 void up() {
