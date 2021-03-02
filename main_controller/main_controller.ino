@@ -1,6 +1,6 @@
 // The metro board does not have the ability to use the usb HID functionality, get the M0 from home for this.
 //#include "HID-Project.h"
-
+#include "Adafruit_NeoPixel.h"
 /*
  * 
  * This is the main controller function. The goal for this one is to control everything 
@@ -9,14 +9,25 @@
  * This will utilize a cooperative scheduler, placing priorities on encoder inputs
  * 
  */
+// pins
 const int pin_pb = 2;
 const int pin_encA = 3;
 const int pin_encB = 4;
+const int pin_neo = 11;
+const int count_led = 8;
+
+// constants
 const int debounce_ms = 50; // ms to debounce the encoder
 const int momentum_ms = 150; // ms to consider momentum for the encoder
 const int pb_debounce_ms = 1000; // ms to debounce the push button on the encoder
 
+// globals
 int encA, encB, val, last_val, delta, mute = 0;
+uint16_t brightness = 10;
+
+// pre-setup
+Adafruit_NeoPixel strip( count_led , pin_neo , NEO_RGBW + NEO_KHZ800 );
+const uint32_t fav_color = strip.Color( 20 , 0 , 100 , brightness );
 
 void setup() {
   // put your setup code here, to run once:
@@ -34,6 +45,12 @@ void setup() {
 
   // start serial port
   Serial.begin(9600);  
+
+  // set the color and start strip
+  strip.begin();
+  strip.show();
+  strip.fill( fav_color );
+  strip.show();
 
 }
 

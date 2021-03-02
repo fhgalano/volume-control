@@ -13,6 +13,19 @@ There are several part to this:
 4) Physical design for 3D printing
 
 Notes:
+----------Python Service----------
+Not Implemented
+
+This should have a packet of information that it expects to get from the arduino
+Additionally, there should be some information sent to the arduino from python
+
+Expected Input Packet (output from arduino)
+volume_val, mute_status, report_time
+
+
+----------Scheduler----------
+Not Implemented
+
 ----------Encoder----------
 SW = Push Button Pin
 DT / CLK = Encoder wheel A/B signals
@@ -24,7 +37,9 @@ CLK as encB
 
 There are only two interrupt pins on the arduino uno (pins 2 & 3), so we cannot use an interrupt for the pushbutton.
 
-TODO: correctly debounce the encoder.
+Encoder Debounced
+
+Encoder PB Implemented
 
 ----------LEDs----------
 Not Implemented
