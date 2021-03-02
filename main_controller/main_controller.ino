@@ -61,9 +61,6 @@ void loop() {
   Serial.println( brightness );
   val_limit();
   update_brightness( val );
-  strip.fill( strip.Color( 0 , 0 , 0 , brightness ) );
-  //strip.fill( fav_color );
-  strip.show();
   delay( 100 );
 
 }
@@ -122,12 +119,15 @@ void update_brightness( int target ) {
   else if ( target < brightness ) {
     brightness--;
   }
-  
-  //if ( temp != brightness ) {
-  //  fav_color = strip.Color( 20 , 0 , 100 , brightness );
-   // strip.fill( fav_color );
-    //strip.show();
-  //}
+
+  if (  mute == 0  ) {
+    strip.fill( strip.Color( 0 , 0 , 0 , brightness ) );
+    strip.show();
+  }
+  else if ( mute == 1 ) {
+    strip.fill( strip.Color( 0 , 0 , 0 , 0 ) );
+    strip.show();
+  }
 }
 
 void val_limit() {
