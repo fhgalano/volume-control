@@ -9,13 +9,14 @@
  * This will utilize a cooperative scheduler, placing priorities on encoder inputs
  * 
  */
-const int pin_pb = 13;
+const int pin_pb = 2;
 const int pin_encA = 3;
-const int pin_encB = 2;
+const int pin_encB = 4;
 const int debounce_ms = 50; // ms to debounce the encoder
-const int momentum_ms = 150; // ms to consier momentum for the encoder
+const int momentum_ms = 150; // ms to consider momentum for the encoder
+const int pb_debounce_ms = 1000; // ms to debounce the push button on the encoder
 
-int encA, encB, val, last_val, delta = 0;
+int encA, encB, val, last_val, delta, mute = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -26,7 +27,7 @@ void setup() {
   pinMode( pin_encB , INPUT );
 
   attachInterrupt( digitalPinToInterrupt( pin_encA ) , encoder_f , FALLING );
-  //attachInterrupt( digitalPinToInterrupt( pin_encB ) , up , FALLING );
+  attachInterrupt( digitalPinToInterrupt( pin_pb ) , pushbutton_f , FALLING );
   
   // start consumer ( controller for media buttons )
   //Consumer.begin()
@@ -38,7 +39,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  Serial.println( val );
+  Serial.println( mute );
   
 
 }
@@ -72,5 +73,19 @@ void encoder_f() {
     delta = val - last_val;
   }
   
+  
+}
+
+void pushbutton_f() {
+  static unsigned long pb_last_interrupt_time = 0;
+  unsigned long interrupt_time = millis();
+
+  if ( pb_last_interrupt_time - interrupt_time > pb_debounce_ms ) {
+    // toggle mute
+    mute = !mute;
+
+    // update debounce time
+    pb_last_interrupt_time = interrupt_time;
+  }
   
 }
