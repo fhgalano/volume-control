@@ -22,6 +22,11 @@ Additionally, there should be some information sent to the arduino from python
 Expected Input Packet (output from arduino)
 volume_val, mute_status, report_time
 
+Possible Output Packet(s) (input to arduino)
+sys_volume - alerts about changes made from inside the system without the wheel
+
+r , g , b  - request to change the color of the wheel? ( this might be a waste, just pick a color )
+
 
 ----------Scheduler----------
 Not Implemented

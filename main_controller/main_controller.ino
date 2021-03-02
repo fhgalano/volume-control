@@ -23,11 +23,11 @@ const int pb_debounce_ms = 1000; // ms to debounce the push button on the encode
 
 // globals
 int encA, encB, val, last_val, delta, mute = 0;
-uint16_t brightness = 10;
+int brightness = 10;
 
 // pre-setup
 Adafruit_NeoPixel strip( count_led , pin_neo , NEO_RGBW + NEO_KHZ800 );
-const uint32_t fav_color = strip.Color( 20 , 0 , 100 , brightness );
+uint32_t fav_color = strip.Color( 20 , 0 , 100 , brightness );
 
 void setup() {
   // put your setup code here, to run once:
@@ -50,14 +50,21 @@ void setup() {
   strip.begin();
   strip.show();
   strip.fill( fav_color );
-  strip.show();
+  //strip.show();
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  Serial.println( mute );
-  
+  Serial.print( val );
+  Serial.print( " " );
+  Serial.println( brightness );
+  val_limit();
+  update_brightness( val );
+  strip.fill( strip.Color( 0 , 0 , 0 , brightness ) );
+  //strip.fill( fav_color );
+  strip.show();
+  delay( 100 );
 
 }
 
@@ -105,4 +112,29 @@ void pushbutton_f() {
     pb_last_interrupt_time = interrupt_time;
   }
   
+}
+
+void update_brightness( int target ) {
+  uint16_t temp = brightness;
+  if ( target > brightness ) {
+    brightness++;
+  }
+  else if ( target < brightness ) {
+    brightness--;
+  }
+  
+  //if ( temp != brightness ) {
+  //  fav_color = strip.Color( 20 , 0 , 100 , brightness );
+   // strip.fill( fav_color );
+    //strip.show();
+  //}
+}
+
+void val_limit() {
+  if (val > 100 ) {
+    val = 100;
+  }
+  else if ( val < 0 ) {
+    val = 0;
+  }
 }
