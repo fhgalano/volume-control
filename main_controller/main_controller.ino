@@ -1,6 +1,3 @@
-// The metro board does not have the ability to use the usb HID functionality, get the M0 from home for this.
-//#include "HID-Project.h"
-#include "Adafruit_NeoPixel.h"
 /*
  * 
  * This is the main controller function. The goal for this one is to control everything 
@@ -9,6 +6,14 @@
  * This will utilize a cooperative scheduler, placing priorities on encoder inputs
  * 
  */
+//====================INCLUDES====================
+//#include "HID-Project.h"
+#include "Adafruit_NeoPixel.h"
+#include "TaskSchedulerDeclarations.h"
+#include "TaskSchedulerSleepMethods.h"
+#include "TaskScheduler.h"
+
+//====================VARS====================
 // pins
 const int pin_pb = 2;
 const int pin_encA = 3;
@@ -25,10 +30,27 @@ const int pb_debounce_ms = 1000; // ms to debounce the push button on the encode
 int encA, encB, val, last_val, delta, mute = 0;
 int brightness = 10;
 
-// pre-setup
+//====================PRE-SETUP====================
+  // leds
 Adafruit_NeoPixel strip( count_led , pin_neo , NEO_RGBW + NEO_KHZ800 );
 uint32_t fav_color = strip.Color( 20 , 0 , 100 , brightness );
 
+  // scheduler
+Scheduler sc;
+
+//====================PROTOTYPES====================
+void encoder_f();
+void pushbutton_f();
+void update_brightness();
+void val_limit();
+void cereal_out();
+
+//====================TASKS====================
+Task tprintout ( 300 , TASK_FOREVER , &cereal_out , &sc , true );
+Task tvallimit ( 100 , TASK_FOREVER , &val_limit , &sc , true );
+Task tupdateb ( 100 , TASK_FOREVER , &update_brightness , &sc , true); 
+
+//====================SETUP====================
 void setup() {
   // put your setup code here, to run once:
   // declare pin modes
@@ -38,7 +60,7 @@ void setup() {
   pinMode( pin_encB , INPUT );
 
   attachInterrupt( digitalPinToInterrupt( pin_encA ) , encoder_f , FALLING );
-  attachInterrupt( digitalPinToInterrupt( pin_pb ) , pushbutton_f , FALLING );
+  attachInterrupt( digitalPinToInterrupt( pin_pb ) , pushbutton_f , RISING );
   
   // start consumer ( controller for media buttons )
   //Consumer.begin()
@@ -54,17 +76,14 @@ void setup() {
 
 }
 
+//====================LOOP====================
 void loop() {
   // put your main code here, to run repeatedly:
-  Serial.print( val );
-  Serial.print( " " );
-  Serial.println( brightness );
-  val_limit();
-  update_brightness( val );
-  delay( 100 );
+  sc.execute();
 
 }
 
+//====================FUNCTIONS====================
 void encoder_f() {
   // declare locals
   static unsigned long last_interrupt_time = 0; // statics persist throughout function calls
@@ -111,12 +130,12 @@ void pushbutton_f() {
   
 }
 
-void update_brightness( int target ) {
+void update_brightness() {
   uint16_t temp = brightness;
-  if ( target > brightness ) {
+  if ( val > brightness ) {
     brightness++;
   }
-  else if ( target < brightness ) {
+  else if ( val < brightness ) {
     brightness--;
   }
 
@@ -136,5 +155,16 @@ void val_limit() {
   }
   else if ( val < 0 ) {
     val = 0;
+  }
+}
+
+// the scheduler function used to print debugs to the monitor
+void cereal_out() {
+  if (Serial) {
+    Serial.print( val );
+    Serial.print( " " );
+    Serial.print( mute );
+    Serial.print( " " );
+    Serial.println( brightness );
   }
 }

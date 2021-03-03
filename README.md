@@ -29,7 +29,7 @@ r , g , b  - request to change the color of the wheel? ( this might be a waste, 
 
 
 ----------Scheduler----------
-Not Implemented
+Basic cooperative scheduler added with the TaskScheduler library
 
 ----------Encoder----------
 SW = Push Button Pin
@@ -47,12 +47,25 @@ Encoder Debounced
 Encoder PB Implemented
 
 ----------LEDs----------
-Not Implemented
+The LED strip will be made from a 8 LED package of adafruit neopixels. This is just what I had on hand.
+
+The brightness off the LEDs will correspond to the volume level of the device. 
+
+The LEDs will turn off 
 
 
 ----------CAD----------
 Not Implemented
 
+
+----------Serial----------
+Serial communication work basically by default on arduino. This section
+pertains to: 
+how reports should be built
+when should reports be transmitted
+when should the device be listening
+
+for the first bit, this will only be focused on outputting reports. so the last req isn't needed yet
 
 UPDATE:
 For anyone looking at the network history and thinking 'what the heck happened here?': I
