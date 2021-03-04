@@ -31,24 +31,25 @@ int encA, encB, val, last_val, delta, mute = 0;
 int brightness = 10;
 
 //====================PRE-SETUP====================
-  // leds
+// leds
 Adafruit_NeoPixel strip( count_led , pin_neo , NEO_RGBW + NEO_KHZ800 );
 uint32_t fav_color = strip.Color( 20 , 0 , 100 , brightness );
 
-  // scheduler
+// scheduler
 Scheduler sc;
 
 //====================PROTOTYPES====================
 void encoder_f();
 void pushbutton_f();
-void update_brightness();
 void val_limit();
+void update_brightness();
 void cereal_out();
+void serial_report();
 
 //====================TASKS====================
 Task tprintout ( 300 , TASK_FOREVER , &cereal_out , &sc , true );
-Task tvallimit ( 100 , TASK_FOREVER , &val_limit , &sc , true );
 Task tupdateb ( 100 , TASK_FOREVER , &update_brightness , &sc , true); 
+Task tserialreport ( 50 , TASK_ONCE , &serial_report , &sc , false );
 
 //====================SETUP====================
 void setup() {
@@ -84,6 +85,16 @@ void loop() {
 }
 
 //====================FUNCTIONS====================
+/*
+ * 
+ * ISR for getting and translating the encoder value
+ * includes debounce of the encoder
+ * also implements an idea of momentum - meaning that in this use case the user will
+ * not rapidly shift from pushing volume up to down. 
+ * 
+ * This is mostly due to how cheap of an encoder I got, and I could avoid it with an optical encoder. 
+ * 
+ */
 void encoder_f() {
   // declare locals
   static unsigned long last_interrupt_time = 0; // statics persist throughout function calls
@@ -116,6 +127,12 @@ void encoder_f() {
   
 }
 
+/*
+ * 
+ * ISR for getting the MUTE toggle signal from the pushbutton
+ * Includes debounce
+ * 
+ */
 void pushbutton_f() {
   static unsigned long pb_last_interrupt_time = 0;
   unsigned long interrupt_time = millis();
@@ -130,7 +147,19 @@ void pushbutton_f() {
   
 }
 
+/*
+ * 
+ * changes the brightness to match the value of val variable. This makes it so the
+ * brightness increases and decreases with the volume
+ * 
+ * Also, it will turn off the LEDs in the case that the mute signal is active
+ * 
+ */
 void update_brightness() {
+  // Limit the val here so that they can't conflict
+  val_limit();
+
+  // Manage brightness
   uint16_t temp = brightness;
   if ( val > brightness ) {
     brightness++;
@@ -149,6 +178,11 @@ void update_brightness() {
   }
 }
 
+/*
+ * 
+ * Limits the value of the val variable so that it doesn't go above 100 or below 0
+ * 
+ */
 void val_limit() {
   if (val > 100 ) {
     val = 100;
@@ -158,13 +192,34 @@ void val_limit() {
   }
 }
 
-// the scheduler function used to print debugs to the monitor
+/*
+ * 
+ * This is what I use to debug to the serial monitor without changing the report
+ * 
+ */
 void cereal_out() {
-  if (Serial) {
+  if ( Serial ) {
     Serial.print( val );
     Serial.print( " " );
     Serial.print( mute );
     Serial.print( " " );
     Serial.println( brightness );
+  }
+}
+
+/*
+ * 
+ * Create a report for the arduino to send to the python script. It will
+ * be in the format of:
+ * Volume,MuteStatus,Time
+ * 
+ */
+void serial_report() {
+  if ( Serial ) {
+    Serial.print( val );
+    Serial.print( "," );
+    Serial.print( mute );
+    Serial.print( "," );
+    Serial.print( millis() );
   }
 }

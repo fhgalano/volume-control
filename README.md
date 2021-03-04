@@ -16,6 +16,10 @@ Notes:
 ----------Python Service----------
 Not Implemented
 
+I'm not seeing an obvious library to use for python to change the system volume. However, python does have the ability to make terminal command calls.
+This should work as long as the call does not require sudo status. So look for a terminal command to set the system volume as well as to get the system
+volume. 
+
 This should have a packet of information that it expects to get from the arduino
 Additionally, there should be some information sent to the arduino from python
 
@@ -36,9 +40,6 @@ SW = Push Button Pin
 DT / CLK = Encoder wheel A/B signals
 + = 5V
 GND = GND
-
-DT as encA
-CLK as encB
 
 There are only two interrupt pins on the arduino uno (pins 2 & 3), so we cannot use an interrupt for the pushbutton.
 
