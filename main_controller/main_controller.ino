@@ -200,10 +200,10 @@ void val_limit() {
 void cereal_out() {
   if ( Serial ) {
     Serial.print( val );
-    Serial.print( " " );
-    Serial.print( mute );
-    Serial.print( " " );
-    Serial.println( brightness );
+    Serial.print( ", " );
+    Serial.print( brightness );
+    Serial.print( ", " );
+    Serial.println( mute );
   }
 }
 
